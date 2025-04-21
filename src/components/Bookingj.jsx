@@ -77,7 +77,7 @@ function Booking() {
             dc
         };
 
-        axios.post("http://localhost:8081/datve", data)
+        axios.post("https://xdw-be.onrender.com/datve", data)
             .then(res => {
                 setTicketInfo(data);
                 setIsBooked(true);
