@@ -11,14 +11,14 @@ function Profile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:8081/auth", {
+        const res = await axios.get("https://xdw-be.onrender.com/auth", {
           withCredentials: true,
         });
 
         if (res.data.Status === "Success") {
           const name = res.data.name;
 
-          const allUsers = await axios.get("http://localhost:8081/users");
+          const allUsers = await axios.get("https://xdw-be.onrender.com/users");
           const foundUser = allUsers.data.users.find(u => u.Tenkh === name);
 
           if (foundUser) {
@@ -30,7 +30,7 @@ function Profile() {
           }
 
           // Sau khi lấy thông tin người dùng xong, lấy luôn vé máy bay
-          const ticketsRes = await axios.get("http://localhost:8081/mytickets", {
+          const ticketsRes = await axios.get("https://xdw-be.onrender.com/mytickets", {
             withCredentials: true,
           });
 
