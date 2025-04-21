@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode'; // import đúng nè
+import { jwtDecode } from 'jwt-decode';
 
 function Signup() {
     const [values, setValues] = useState({
@@ -23,10 +23,12 @@ function Signup() {
             return;
         }
 
-        axios.post(`https://xdw-be.onrender.com/signup`, values)
+        axios.post(`https://xdw-be.onrender.com/signup`, values, {
+            withCredentials: true
+        })
             .then(res => {
                 alert("Đăng ký thành công");
-                navigate("/");
+                navigate("/"); // hoặc navigate("/profile") nếu có
             })
             .catch(err => {
                 console.error("Lỗi đăng ký:", err);
@@ -36,7 +38,7 @@ function Signup() {
 
     const handleGoogleSuccess = (credentialResponse) => {
         try {
-           const decoded = jwtDecode(credentialResponse.credential);
+            const decoded = jwtDecode(credentialResponse.credential);
             console.log("Thông tin Google:", decoded);
 
             const googleUser = {
@@ -46,7 +48,9 @@ function Signup() {
                 password: decoded.sub // Dùng sub làm mật khẩu tạm
             };
 
-            axios.post(`https://xdw-be.onrender.com/signup`, googleUser)
+            axios.post(`https://xdw-be.onrender.com/signup`, googleUser, {
+                withCredentials: true
+            })
                 .then(res => {
                     alert("Đăng ký bằng Google thành công");
                     navigate("/");
