@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { GoogleLogin } from '@react-oauth/google';
-import { auth, googleProvider } from './firebase'; // Tên file đúng là Firebase.jsx
-import { signInWithCredential } from 'firebase/auth';
-import jwtDecode from 'jwt-decode'; // ✅ đúng cách import jwt-decode
+import { jwtDecode } from 'jwt-decode'; // import đúng nè
 
 function Signup() {
     const [values, setValues] = useState({
@@ -14,41 +12,63 @@ function Signup() {
         password: ""
     });
 
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    function HandleSubmit(e) {
+    const handleSubmit = (e) => {
         e.preventDefault();
+
+        if (!values.name || !values.email || !values.password) {
+            setError("Vui lòng điền đầy đủ thông tin");
+            return;
+        }
+
         axios.post(`http://localhost:8081/signup`, values)
-            .then(() => {
+            .then(res => {
                 alert("Đăng ký thành công");
                 navigate("/");
+            })
+            .catch(err => {
+                console.error("Lỗi đăng ký:", err);
+                setError("Tài khoản đã tồn tại. Vui lòng thử lại.");
             });
-    }
+    };
 
-    const handleGoogleSuccess = async (credentialResponse) => {
-        const decoded = jwtDecode(credentialResponse.credential); // ✅ dùng jwtDecode
-        const googleUser = {
-            name: decoded.name,
-            email: decoded.email,
-            password: decoded.sub, // Dùng Google ID làm mật khẩu
-            phone: ""
-        };
-
+    const handleGoogleSuccess = (credentialResponse) => {
         try {
-            const credential = googleProvider.credential(credentialResponse.credential);
-            await signInWithCredential(auth, credential);
+           const decoded = jwtDecode(credentialResponse.credential);
+            console.log("Thông tin Google:", decoded);
 
-            await axios.post(`http://localhost:8081/signup`, googleUser);
-            alert("Đăng ký bằng Google thành công");
-            navigate("/");
+            const googleUser = {
+                name: decoded.name,
+                phone: "",
+                email: decoded.email,
+                password: decoded.sub // Dùng sub làm mật khẩu tạm
+            };
+
+            axios.post(`http://localhost:8081/signup`, googleUser)
+                .then(res => {
+                    alert("Đăng ký bằng Google thành công");
+                    navigate("/");
+                })
+                .catch(err => {
+                    console.error("Lỗi đăng ký Google:", err);
+                    setError("Đăng ký bằng Google thất bại. Vui lòng thử lại.");
+                });
+
         } catch (error) {
-            console.error("Lỗi khi đăng ký với Google:", error);
+            console.error("Lỗi giải mã token Google:", error);
+            setError("Đăng ký bằng Google thất bại.");
         }
+    };
+
+    const handleGoogleError = () => {
+        setError("Đăng ký Google thất bại. Vui lòng thử lại.");
     };
 
     return (
         <div className="login-container">
-            <form className="login-form" onSubmit={HandleSubmit}>
+            <form className="login-form" onSubmit={handleSubmit}>
                 <p style={{ textAlign: "center", fontSize: "20px", marginBottom: "10px" }}>ĐĂNG KÝ</p>
 
                 <label>Họ và Tên: </label>
@@ -63,7 +83,9 @@ function Signup() {
                 <label>Mật khẩu: </label>
                 <input type="password" placeholder="*********" name="password" onChange={e => setValues({ ...values, password: e.target.value })} />
 
-                <button>Đăng ký</button>
+                <button type="submit">Đăng ký</button>
+
+                {error && <p style={{ fontSize: "12px", color: "red", textAlign: "center" }}>{error}</p>}
 
                 <p style={{ fontSize: "12px", textAlign: "center" }}>
                     Bạn đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
@@ -75,7 +97,7 @@ function Signup() {
                 <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
                     <GoogleLogin
                         onSuccess={handleGoogleSuccess}
-                        onError={() => console.log("Đăng ký Google thất bại")}
+                        onError={handleGoogleError}
                     />
                 </div>
             </form>
