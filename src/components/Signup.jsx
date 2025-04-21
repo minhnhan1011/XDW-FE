@@ -23,7 +23,7 @@ function Signup() {
             return;
         }
 
-        axios.post(`http://localhost:8081/signup`, values)
+        axios.post(`https://xdw-be.onrender.com/signup`, values)
             .then(res => {
                 alert("Đăng ký thành công");
                 navigate("/");
@@ -46,7 +46,7 @@ function Signup() {
                 password: decoded.sub // Dùng sub làm mật khẩu tạm
             };
 
-            axios.post(`http://localhost:8081/signup`, googleUser)
+            axios.post(`https://xdw-be.onrender.com/signup`, googleUser)
                 .then(res => {
                     alert("Đăng ký bằng Google thành công");
                     navigate("/");
