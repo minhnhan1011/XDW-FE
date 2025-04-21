@@ -26,7 +26,7 @@ function Header() {
   useEffect(() => {
     const checkToken = async () => {
       try {
-        const res = await axios.get('http://localhost:8081/auth', { withCredentials: true });
+        const res = await axios.get('https://xdw-be.onrender.com/auth', { withCredentials: true });
         if (res.data.Status === 'Success') {
           setAuth(true);
           setName(res.data.name);
@@ -41,7 +41,7 @@ function Header() {
   }, []);
 
   const handleLogout = () => {
-    axios.get('http://localhost:8081/logout', { withCredentials: true })
+    axios.get('https://xdw-be.onrender.com/logout', { withCredentials: true })
       .then(() => {
         setAuth(false);
         setName('');
