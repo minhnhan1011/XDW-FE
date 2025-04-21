@@ -23,7 +23,7 @@ function Login() {
             return;
         }
 
-        axios.post(`http://localhost:8081/login`, values)
+        axios.post(`https://xdw-be.onrender.com/login`, values)
             .then(res => {
                 if (res.data.Status === "Đăng nhập thành công") {
                     navigate("/");
@@ -43,7 +43,7 @@ function Login() {
 
         console.log(decoded); // Debug Google data
 
-        axios.post('http://localhost:8081/google-login', {
+        axios.post('https://xdw-be.onrender.com/google-login', {
             email: decoded.email,
             name: decoded.name,
             googleId: decoded.sub
